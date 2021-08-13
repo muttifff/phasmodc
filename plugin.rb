@@ -44,7 +44,7 @@ after_initialize do
   end
 
   STDERR.puts '---------------------------------------------------'
-  STDERR.puts 'Bot should now be spawned, say "Ping!" on Discord!'
+  STDERR.puts '       Discord bot plugin devrede by MLP!'
   STDERR.puts '---------------------------------------------------'
-  STDERR.puts '(-------      If not check logs          ---------)'
+  STDERR.puts '(-------      Logları kontrol et          ---------)'
 end
