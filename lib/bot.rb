@@ -8,7 +8,7 @@ class ::DiscordBot::Bot
 
     @@DiscordBot.ready do |event|
       puts "Logged in as #{@@DiscordBot.profile.username} (ID:#{@@DiscordBot.profile.id}) | #{@@DiscordBot.servers.size} servers"
-      @@DiscordBot.send_message(SiteSetting.discord_bot_admin_channel_id, "The Discourse admin bot has started his shift!")
+      @@DiscordBot.send_message(SiteSetting.discord_bot_admin_channel_id, "Otomatik yetki verme botu devrede!")
     end
 
     @@DiscordBot
