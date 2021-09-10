@@ -74,14 +74,14 @@ module ::DiscordBot::BotCommands
       discord_roles =[]
       ug_list = []
 
-      event.respond "Discourse Sync:  Starting.  Please be patient, I'm rate limited to respect Discord services."
-      event.respond "Discourse Sync:  Checking if there are any eligible groups for sync ..."
+      event.respond "Phasmo Sync:  Starting.  Please be patient, I'm rate limited to respect Discord services."
+      event.respond "Phasmo Sync:  Checking if there are any eligible groups for sync ..."
 
       eligiblegroupbuilder = DB.build("select id from groups /*where*/")
       eligiblegroupbuilder.where("visibility_level <= :visibility", visibility: max_group_visibility.to_i)
       unless include_automated_groups.to_s.downcase == "true" then eligiblegroupbuilder.where("automatic = false") end
 
-      event.respond "Discourse Sync: #{eligiblegroupbuilder.query.count} eligible group(s) were found"
+      event.respond "Phasmo Sync: #{eligiblegroupbuilder.query.count} eligible group(s) were found"
 
       unless eligiblegroupbuilder.query.count == 0
 
@@ -89,7 +89,7 @@ module ::DiscordBot::BotCommands
           eligible_discourse_groups << g.id
         end
 
-        event.respond "Discourse Sync:  Preparing list of users who also have a registered account on Discord ..."
+        event.respond "Phasmo Sync:  Preparing list of users who also have a registered account on Discord ..."
 
         builder = DB.build("select * from user_associated_accounts /*where*/")
         builder.where("provider_name = :provider_name", provider_name: "discord")
@@ -97,7 +97,7 @@ module ::DiscordBot::BotCommands
           discord_users << {discourse_user_id: t.user_id, discord_uid: t.provider_uid}
         end
 
-        event.respond "Discourse Sync:  Preparing list of groups that users who have a registered account on Discord belong to on Discourse ..."
+        event.respond "Phasmo Sync:  Preparing list of groups that users who have a registered account on Discord belong to on Discourse ..."
 
         discord_users.each do |user|
           groupbuilder = DB.build("select group_id from group_users /*where*/")
@@ -120,11 +120,11 @@ module ::DiscordBot::BotCommands
           end
         end
 
-        event.respond "Discourse Sync: #{discourse_groups.length} eligible group(s) were found with Discord users"
+        event.respond "Phasmo Sync: #{discourse_groups.length} eligible group(s) were found with Discord users"
 
         unless discourse_groups.length == 0
 
-          event.respond "Discourse Sync:  Retrieving list of roles from Discord server ..."
+          event.respond "Phasmo Sync:  Retrieving list of roles from Discord server ..."
 
           event.server.roles.each do |r|
             discord_roles << {name: r.name, id: r.id}
@@ -140,13 +140,13 @@ module ::DiscordBot::BotCommands
 
           if clean_house.to_s.downcase == "true"
 
-            event.respond "Discourse Sync:  Deleting existing mapping roles ..."
+            event.respond "Phasmo Sync:  Deleting existing mapping roles ..."
 
             discourse_groups_count = discourse_groups.count
 
             discourse_groups.each_with_index do |g, index|
 
-              event.respond "Discourse Sync:  [#{index + 1}/#{discourse_groups_count}] Attempting to delete Role"
+              event.respond "Phasmo Sync:  [#{index + 1}/#{discourse_groups_count}] Attempting to delete Role"
 
               if !discord_roles.detect{|r| r[:name] == g[:discourse_name] }.nil?
                 role_id = discord_roles.detect{|r| r[:name] == g[:discourse_name] }[:id]
@@ -157,17 +157,17 @@ module ::DiscordBot::BotCommands
               unless role_id.nil?
                 begin
                   event.server.role(role_id).delete("Discourse Sync Cleanup")
-                  event.respond "Discourse Sync:  Role '#{g[:discourse_name]}' deleted as part of cleanup"
+                  event.respond "Phasmo Sync:  Role '#{g[:discourse_name]}' deleted as part of cleanup"
                   sleep(SiteSetting.discord_bot_rate_limit_delay)
                 rescue => e
-                  event.respond 'Discourse Sync:  I dont appear to have rights to do this though!'
+                  event.respond 'Phasmo Sync:  I dont appear to have rights to do this though!'
                   bot.send_message(SiteSetting.discord_bot_admin_channel_id, "ERROR on server #{event.server.name} (ID: #{event.server.id}) for command `^role deletion`, `#{e}`")
                 end
               end
             end
           end
 
-          event.respond "Discourse Sync:  Creating missing Roles on Discord server ..."
+          event.respond "Phasmo Sync:  Creating missing Roles on Discord server ..."
 
           discord_roles = []
 
@@ -179,18 +179,18 @@ module ::DiscordBot::BotCommands
 
           discourse_groups.each_with_index do |g, index|
 
-            event.respond "Discourse Sync:  [#{index + 1}/#{discourse_groups_count}] Attempting to create Role for #{g[:discourse_name]}"
+            event.respond "Phasmo Sync:  [#{index + 1}/#{discourse_groups_count}] Attempting to create Role for #{g[:discourse_name]}"
 
             if !discord_roles.any?{|hash| hash[:name] == g[:discourse_name]}
             begin
               event.server.create_role(name: g[:discourse_name])
-              event.respond "Discourse Sync:  Role '#{g[:discourse_name]}' created!"
+              event.respond "Phasmo Sync:  Role '#{g[:discourse_name]}' created!"
             rescue => e
-              event.respond 'Discourse Sync:  I dont appear to have rights to create Roles!'
+              event.respond 'Phasmo Sync:  I dont appear to have rights to create Roles!'
               bot.send_message(SiteSetting.discord_bot_admin_channel_id, "ERROR on server #{event.server.name} (ID: #{event.server.id}) for command `^role create`, `#{e}`")
             end
             else
-              event.respond "Discourse Sync:  Role '#{g[:discourse_name]}' already exists!"
+              event.respond "Phasmo Sync:  Role '#{g[:discourse_name]}' already exists!"
             end
 
             sleep(SiteSetting.discord_bot_rate_limit_delay)
@@ -202,7 +202,7 @@ module ::DiscordBot::BotCommands
             discord_roles << {name: r.name, id: r.id}
           end
 
-          event.respond "Discourse Sync:  Building user role mapping ..."
+          event.respond "Phasmo Sync:  Building user role mapping ..."
 
           ug_list.each do |ug|
             entrybuilder = DB.build("select name from groups /*where*/ limit 1")
@@ -219,29 +219,29 @@ module ::DiscordBot::BotCommands
             end
           end
 
-          event.respond "Discourse Sync:  Adding users to roles ..."
+          event.respond "Phasmo Sync:  Adding users to roles ..."
 
           ug_count = ug_list.count
           ug_list.each_with_index do |ug, index|
-            event.respond "Discourse Sync:  [#{index + 1}/#{ug_count}] Adding member '#{ug[:discourse_username]}' to '#{ug[:discourse_group_name]}'"
+            event.respond "Phasmo Sync:  [#{index + 1}/#{ug_count}] Adding member '#{ug[:discourse_username]}' to '#{ug[:discourse_group_name]}'"
             event.server.member(ug[:discord_uid]).add_role(ug[:discord_group_id])
             sleep(SiteSetting.discord_bot_rate_limit_delay)
             rescue => e
-              event.respond 'Discourse Sync:  I dont appear to have rights to do this though!'
+              event.respond 'Phasmo Sync:  I dont appear to have rights to do this though!'
               bot.send_message(SiteSetting.discord_bot_admin_channel_id, "ERROR on server #{event.server.name} (ID: #{event.server.id}) for command `^add_role`, `#{e}`")
           end
 
-          event.respond "Discourse Sync:  DONE!"
+          event.respond "Phasmo Sync:  DONE!"
         else
-          event.respond "Discourse Sync:  No users were found in elibigle groups for sync using provided or default criteria!"
+          event.respond "Phasmo Sync:  No users were found in elibigle groups for sync using provided or default criteria!"
         end
       else
-        event.respond "Discourse Sync:  No eligible groups for sync using provided or default criteria!"
+        event.respond "Phasmo Sync:  No eligible groups for sync using provided or default criteria!"
       end
     end
 
-    bot.message(with_text: 'Ping!' ) do |event|
-      event.respond 'Pong!'
+    bot.message(with_text: 'silivri' ) do |event|
+      event.respond 'Silivri dedinde silivri kaşarı doruk aklıma geldi, ah o eski günler...'
     end
 
     bot.run
