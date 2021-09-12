@@ -243,6 +243,9 @@ module ::DiscordBot::BotCommands
     bot.message(with_text: 'silivri' ) do |event|
       event.respond 'Silivri dedinde silivri kaşarı doruk aklıma geldi, ah o eski günler...'
     end
+    bot.message(with_text: 'izmir' ) do |event|
+      event.respond 'Manita izmiri kazanınca benim sıfat-ı-eşgal-ül teşkal-ül meşgal https://i.hizliresim.com/q4wlwrb.jpg'
+    end
 
     bot.run
   end
