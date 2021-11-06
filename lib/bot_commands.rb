@@ -246,9 +246,6 @@ module ::DiscordBot::BotCommands
     bot.message(with_text: 'izmir' ) do |event|
       event.respond 'Manita izmiri kazanınca benim sıfat-ı-eşgal-ül teşkal-ül meşgal https://i.hizliresim.com/q4wlwrb.jpg'
     end
-    bot.message(with_text: '!reaksiyon' ) do |event|
-      event.respond '!reaksiyon @rol <KANAL ID> <STAFF ID>'
-    end
     bot.run
   end
 end
